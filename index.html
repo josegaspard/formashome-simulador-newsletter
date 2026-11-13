@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Formas Home · Simulador de newsletter</title>
+<link rel="icon" href="img/fh-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1C1B19; --ink-2:#5A534A; --muted:#6F675C; --soft:#A7A093;
+  --cream:#FAF8F4; --cream-2:#F8F4EC; --neutral:#F2ECE1; --neutral-2:#EFE9DF;
+  --line:#E4E0D7; --wood:#8A6A4A; --wood-soft:#E8D8C8; --white:#fff; --green:#2F6B3A;
+  --serif:"Cormorant Garamond", Georgia, serif; --sans:"Jost", system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-weight:400;line-height:1.55;overflow-x:hidden}
+img{display:block;max-width:100%}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+a{color:inherit}
+
+/* ---------- cabecera ---------- */
+.top{border-bottom:1px solid var(--line);background:var(--white)}
+.top-in{max-width:1180px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.top img{height:26px;width:auto}
+.top span{font-size:13px;color:var(--muted);letter-spacing:.02em}
+
+.hero{max-width:1180px;margin:0 auto;padding:56px 24px 28px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:end}
+.hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(38px,5.2vw,64px);line-height:1.02;letter-spacing:-.01em}
+.hero p{color:var(--ink-2);font-size:17px;max-width:46ch}
+.hero .kick{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--wood);margin-bottom:14px;font-weight:500}
+
+/* ---------- simulador ---------- */
+.sim{max-width:1180px;margin:0 auto;padding:24px 24px 72px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:56px;align-items:start}
+.steps{display:flex;flex-direction:column;gap:2px;position:sticky;top:24px}
+.step{display:grid;grid-template-columns:44px 1fr;gap:16px;text-align:left;padding:18px 18px 18px 14px;border-radius:4px;transition:background .25s}
+.step:hover{background:var(--neutral)}
+.step .dot{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;background:var(--white);transition:all .25s}
+.step .dot svg{width:20px;height:20px;stroke:var(--ink-2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.step .when{font-size:12px;color:var(--wood);letter-spacing:.06em;text-transform:uppercase;font-weight:500}
+.step h3{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.15;margin:2px 0 4px}
+.step p{font-size:15px;color:var(--muted)}
+.step.on{background:var(--white);box-shadow:0 1px 0 var(--line),0 12px 32px -18px rgba(28,27,25,.25)}
+.step.on .dot{background:var(--ink);border-color:var(--ink)}
+.step.on .dot svg{stroke:var(--white)}
+.controls{display:flex;gap:10px;margin-top:18px;padding-left:14px;flex-wrap:wrap}
+.btn{font-size:13px;text-transform:uppercase;letter-spacing:.1em;font-weight:500;padding:14px 22px;border-radius:2px;background:var(--ink);color:var(--white);transition:background .2s}
+.btn:hover{background:#000}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--white)}
+
+/* ---------- teléfono ---------- */
+.phone-wrap{position:sticky;top:24px;display:flex;justify-content:center}
+.phone{width:376px;height:780px;border-radius:54px;background:#111;padding:12px;box-shadow:0 40px 80px -30px rgba(28,27,25,.45),0 0 0 1px #2a2825 inset}
+.screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;background:var(--white)}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:110px;height:32px;border-radius:20px;background:#000;z-index:30}
+.status{position:absolute;top:0;left:0;right:0;height:50px;display:flex;justify-content:space-between;align-items:center;padding:6px 30px 0;font-size:15px;font-weight:600;z-index:25;pointer-events:none}
+.status.light{color:var(--white)}
+.view{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s}
+.view.on{opacity:1;visibility:visible}
+.scroll{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+
+/* vista web */
+.w-bar{padding:54px 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);background:var(--white)}
+.w-bar img{height:16px;width:auto}
+.w-bar i{display:block;width:18px;height:1.5px;background:var(--ink);box-shadow:0 5px 0 var(--ink),0 -5px 0 var(--ink)}
+.w-ann{background:var(--ink);color:var(--white);font-size:10.5px;text-align:center;padding:6px 8px;letter-spacing:.03em}
+.w-hero{position:relative;height:300px;overflow:hidden}
+.w-hero img{width:100%;height:100%;object-fit:cover}
+.w-hero div{position:absolute;left:16px;bottom:18px;color:var(--white);text-shadow:0 1px 12px rgba(0,0,0,.35)}
+.w-hero b{font-family:var(--serif);font-weight:500;font-size:30px;line-height:1;display:block}
+.w-hero small{font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.w-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.w-grid div{background:var(--cream-2);aspect-ratio:1/1;display:grid;place-items:center;padding:10px}
+.veil{position:absolute;inset:0;background:rgba(28,27,25,.42);opacity:0;transition:opacity .4s;z-index:10}
+.view.pop .veil{opacity:1}
+.popup{position:absolute;left:12px;right:12px;bottom:14px;background:var(--cream);border-radius:6px;overflow:hidden;z-index:12;transform:translateY(110%);transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.view.pop .popup{transform:none}
+.popup .ph{height:150px;overflow:hidden;position:relative}
+.popup .ph img{width:100%;height:100%;object-fit:cover}
+.popup .x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;font-size:15px}
+.popup .pb{padding:18px 18px 20px;text-align:center}
+.popup h4{font-family:var(--serif);font-weight:500;font-size:28px;line-height:1.05;margin-bottom:6px}
+.popup p{font-size:13px;color:var(--muted);margin-bottom:14px}
+.popup input{width:100%;border:1px solid var(--line);background:var(--white);padding:13px 14px;font:inherit;font-size:14px;border-radius:2px;margin-bottom:8px;color:var(--ink)}
+.popup input:focus{outline:1px solid var(--ink)}
+.popup .btn{width:100%}
+.popup .fine{font-size:10.5px;color:var(--soft);margin:10px 0 0}
+
+/* notificación entrante */
+.banner{position:absolute;top:54px;left:10px;right:10px;z-index:40;background:rgba(245,243,239,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:20px;padding:12px 14px;display:grid;grid-template-columns:38px 1fr;gap:10px;box-shadow:0 12px 30px -12px rgba(0,0,0,.35);transform:translateY(-160%);transition:transform .5s cubic-bezier(.2,.9,.2,1);cursor:pointer}
+.banner.in{transform:none}
+.banner .ic{width:38px;height:38px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
+.banner .ic img{width:24px;filter:brightness(0) invert(1)}
+.banner .ic.mail{background:#2E7CF6}
+.banner .ic.mail svg{width:22px;stroke:#fff;fill:none;stroke-width:1.7}
+.banner b{font-size:13.5px;display:flex;justify-content:space-between}
+.banner b small{font-weight:400;color:#8a857c;font-size:12px}
+.banner span{font-size:13px;line-height:1.3;display:block;color:#2b2a27}
+
+/* ---------- correo ---------- */
+.mailbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:52px 16px 10px;border-bottom:1px solid #eee}
+.mailbar .from{display:flex;gap:10px;align-items:center}
+.mailbar .av{width:34px;height:34px;border-radius:50%;background:var(--ink);display:grid;place-items:center;flex:none}
+.mailbar .av img{width:20px;filter:brightness(0) invert(1)}
+.mailbar b{font-size:13.5px;display:block;line-height:1.2}
+.mailbar small{font-size:12px;color:#8a857c}
+.mailbar .subj{font-weight:600;font-size:15px;margin-top:8px;line-height:1.3}
+.em{background:var(--cream)}
+.em-head{padding:22px 0 18px;text-align:center;background:var(--white)}
+.em-head img{height:18px;width:auto;margin:0 auto}
+.em-hero{position:relative}
+.em-hero img{width:100%;height:230px;object-fit:cover}
+.em-body{padding:26px 22px 8px;text-align:center}
+.em-body .k{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--wood);font-weight:500}
+.em-body h2{font-family:var(--serif);font-weight:500;font-size:31px;line-height:1.05;margin:8px 0 10px}
+.em-body p{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.coupon{margin:20px 22px 6px;border:1px dashed var(--wood);background:var(--white);padding:16px;text-align:center}
+.coupon small{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.coupon strong{display:block;font-family:var(--serif);font-size:40px;font-weight:500;line-height:1.05;margin:2px 0}
+.coupon code{font-family:var(--sans);font-size:13px;letter-spacing:.2em;background:var(--neutral);padding:6px 12px;display:inline-block;margin-top:6px;font-weight:500}
+.em-cta{display:block;margin:18px 22px 4px;background:var(--ink);color:var(--white);text-align:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:15px;font-weight:500;text-decoration:none}
+.em-sec{font-family:var(--serif);font-size:22px;font-weight:500;text-align:center;margin:30px 22px 12px}
+.em-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.card{background:var(--white);padding:10px 10px 12px;text-align:left}
+.card .im{background:var(--cream-2);aspect-ratio:4/3;display:grid;place-items:center;padding:6px;margin-bottom:8px}
+.card .im img{max-height:100%;object-fit:contain}
+.card b{display:block;font-weight:500;font-size:12.5px;line-height:1.25}
+.card .pr{font-size:12.5px;margin-top:3px}
+.card .pr s{color:var(--soft);margin-left:4px;font-size:11.5px}
+.card .cu{font-size:10.5px;color:var(--green);margin-top:2px;font-weight:500}
+.bens{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:26px 14px 0;padding:16px 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bens div{text-align:center;font-size:10.5px;line-height:1.3;color:var(--ink-2)}
+.bens svg{width:22px;height:22px;stroke:var(--wood);fill:none;stroke-width:1.4;margin:0 auto 6px;display:block}
+.em-foot{text-align:center;padding:22px 22px 40px;font-size:10.5px;color:var(--muted);line-height:1.6}
+.em-foot .soc{display:flex;justify-content:center;gap:14px;margin-bottom:10px;font-size:11.5px;color:var(--ink);text-transform:uppercase;letter-spacing:.1em}
+.cart{margin:18px 14px 0;background:var(--white);display:grid;grid-template-columns:120px 1fr;gap:12px;padding:12px;align-items:center;text-align:left}
+.cart .im{background:var(--cream-2);aspect-ratio:1/1;display:grid;place-items:center;padding:6px}
+.cart b{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.1;display:block}
+.cart small{font-size:11.5px;color:var(--muted);display:block;margin:2px 0 6px}
+.cart .pr{font-size:14px}
+.cart .pr s{color:var(--soft);font-size:12px;margin-left:4px}
+.cart .cu{font-size:11px;color:var(--green);font-weight:500}
+.rev{margin:18px 22px 0;text-align:center;font-family:var(--serif);font-size:18px;font-style:italic;color:var(--ink-2);line-height:1.35}
+.rev small{display:block;font-family:var(--sans);font-style:normal;font-size:11px;margin-top:6px;color:var(--muted)}
+
+/* ---------- pantalla bloqueada ---------- */
+.lock{position:absolute;inset:0;background:#2a2620}
+.lock>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.62) saturate(.9)}
+.lock .clock{position:absolute;top:84px;left:0;right:0;text-align:center;color:#fff}
+.lock .clock small{font-size:16px;font-weight:500;opacity:.92}
+.lock .clock b{display:block;font-size:84px;font-weight:300;line-height:1;letter-spacing:-.02em;margin-top:2px}
+.lock .notifs{position:absolute;left:10px;right:10px;bottom:110px;display:flex;flex-direction:column;gap:8px}
+.lock .n{background:rgba(245,243,239,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;padding:12px 14px;display:grid;grid-template-columns:38px 1fr;gap:10px;opacity:0;transform:translateY(16px) scale(.98);transition:all .5s cubic-bezier(.2,.9,.2,1)}
+.lock .n.in{opacity:1;transform:none}
+.lock .n .ic{width:38px;height:38px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
+.lock .n .ic img{width:24px;filter:brightness(0) invert(1)}
+.lock .n b{font-size:13.5px;display:flex;justify-content:space-between}
+.lock .n b small{font-weight:400;color:#7d776e;font-size:12px}
+.lock .n span{font-size:13px;line-height:1.32;display:block;color:#24221f}
+.lock .n .thumb{grid-column:2;margin-top:8px;border-radius:10px;overflow:hidden;background:var(--cream-2);height:110px;display:grid;place-items:center}
+.lock .n .thumb img{max-height:100px}
+.lock .bar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#fff}
+
+/* ---------- debajo ---------- */
+.band{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sec{max-width:1180px;margin:0 auto;padding:64px 24px}
+.sec h2{font-family:var(--serif);font-weight:500;font-size:clamp(30px,3.6vw,44px);line-height:1.05;margin-bottom:10px}
+.sec>p{color:var(--ink-2);max-width:62ch;margin-bottom:34px}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--ink)}
+.flow div{padding:20px 18px 6px 0}
+.flow .t{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--wood);font-weight:500}
+.flow b{display:block;font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.15;margin:6px 0}
+.flow p{font-size:14px;color:var(--muted)}
+.flow .ok{display:inline-block;margin-top:10px;font-size:12px;color:var(--green);font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:8px}
+.facts div{background:var(--cream);padding:22px 20px}
+.facts b{font-family:var(--serif);font-size:40px;font-weight:500;line-height:1;display:block}
+.facts span{font-size:14px;color:var(--muted)}
+.ask{list-style:none;counter-reset:a}
+.ask li{counter-increment:a;padding:16px 0 16px 46px;border-bottom:1px solid var(--line);position:relative;font-size:15.5px;color:var(--ink-2)}
+.ask li:before{content:counter(a);position:absolute;left:0;top:14px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--white);display:grid;place-items:center;font-size:13px;font-weight:500}
+.ask b{color:var(--ink);font-weight:500}
+.note{font-size:13px;color:var(--muted);margin-top:14px}
+footer{text-align:center;padding:36px 24px 48px;font-size:13px;color:var(--muted)}
+footer img{height:20px;width:auto;margin:0 auto 10px;opacity:.85}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr;gap:16px;padding-top:40px}
+  .sim{grid-template-columns:1fr;gap:28px}
+  .steps{position:static;flex-direction:row;overflow-x:auto;gap:8px;padding-bottom:6px;scrollbar-width:none}
+  .steps::-webkit-scrollbar{display:none}
+  .step{min-width:230px;grid-template-columns:36px 1fr;padding:14px}
+  .step .dot{width:36px;height:36px}
+  .step h3{font-size:19px}
+  .step p{display:none}
+  .controls{padding-left:0}
+  .phone-wrap{position:static}
+  .flow{grid-template-columns:1fr 1fr;gap:0 18px}
+  .two{grid-template-columns:1fr;gap:36px}
+}
+@media (max-width:520px){
+  .top-in,.hero,.sim,.sec{padding-left:16px;padding-right:16px}
+  .top span{display:none}
+  .phone{width:100%;max-width:360px;height:740px;border-radius:48px;padding:10px}
+  .screen{border-radius:39px}
+  .flow{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="top-in">
+  <img src="img/fh-logo-negro.png" alt="Formas Home">
+  <span>Propuesta para Formas Home · noviembre 2026</span>
+</div></header>
+
+<section class="hero">
+  <div>
+    <div class="kick">Simulador · Newsletter y avisos automáticos</div>
+    <h1>Así le llegaría Formas Home a cada persona que visita la web</h1>
+  </div>
+  <p>Toquen cada paso o usen «Siguiente». En el teléfono ven exactamente lo que recibiría un cliente: desde que deja su correo en la web hasta el aviso en su celular. Los productos, precios y fotos son los de la tienda hoy.</p>
+</section>
+
+<main class="sim">
+  <div>
+    <div class="steps" id="steps">
+      <button class="step on" data-s="0"><span class="dot"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="1.5"/><path d="M8 21h8M12 18v3"/></svg></span>
+        <span><span class="when">En la web</span><h3>Deja su correo</h3><p>Una ventana elegante a los pocos segundos de navegar, con un regalo para su primera compra.</p></span></button>
+      <button class="step" data-s="1"><span class="dot"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m3 7 9 6 9-6"/></svg></span>
+        <span><span class="when">Al instante</span><h3>Correo de bienvenida</h3><p>Le llega su cupón y una selección de los muebles más elegidos, con las 6 cuotas sin intereses.</p></span></button>
+      <button class="step" data-s="2"><span class="dot"><svg viewBox="0 0 24 24"><path d="M4 19V9l8-5 8 5v10"/><path d="M9 19v-6h6v6"/></svg></span>
+        <span><span class="when">Cada 15 días</span><h3>Newsletter de novedades</h3><p>Ofertas, colecciones nuevas e ideas para el hogar. Se arma con los productos de la tienda.</p></span></button>
+      <button class="step" data-s="3"><span class="dot"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h11.2L21 8H6.2"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg></span>
+        <span><span class="when">1 hora después</span><h3>Carrito olvidado</h3><p>Si deja un mueble en el carrito sin pagar, le recordamos con su foto, precio y cuotas.</p></span></button>
+      <button class="step" data-s="4"><span class="dot"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span>
+        <span><span class="when">En su celular</span><h3>Aviso en la pantalla</h3><p>Bajadas de precio y novedades llegan como notificación, aunque no abra su correo.</p></span></button>
+    </div>
+    <div class="controls">
+      <button class="btn" id="next">Siguiente</button>
+      <button class="btn ghost" id="replay">Ver de nuevo</button>
+    </div>
+  </div>
+
+  <div class="phone-wrap"><div class="phone"><div class="screen" id="screen">
+    <div class="island"></div>
+    <div class="status" id="status"><span id="hora">9:41</span><span>●●● ▮</span></div>
+
+    <div class="banner" id="banner"><div class="ic mail"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+      <div><b>Formas Home <small>ahora</small></b><span id="bannerTxt">Bienvenido a Formas Home: aquí está tu regalo de S/ 100</span></div></div>
+
+    <!-- 0 · web + ventana -->
+    <section class="view on" data-v="0">
+      <div class="scroll">
+        <div class="w-bar"><i></i><img src="img/fh-logo-negro.png" alt=""><span style="width:18px"></span></div>
+        <div class="w-ann">Hasta 6 cuotas sin intereses con Mercado Pago desde S/ 1,000</div>
+        <div class="w-hero"><img src="img/fh-slide-coleccion-delia.webp" alt=""><div><small>Colección</small><b>Delia</b></div></div>
+        <div class="w-grid">
+          <div><img src="img/sofa-delia-boucle-madera-tornillo.webp" alt=""></div>
+          <div><img src="img/sofa-curvo-misti.webp" alt=""></div>
+          <div><img src="img/sofa-oslo-3-cuerpos.webp" alt=""></div>
+          <div><img src="img/mesa-redonda-manila.webp" alt=""></div>
+        </div>
+      </div>
+      <div class="veil"></div>
+      <div class="popup">
+        <div class="ph"><img src="img/coleccion-mila-formas-home_webp.webp" alt=""><button class="x" id="closePop" aria-label="Cerrar">×</button></div>
+        <div class="pb">
+          <h4>S/ 100 para tu primera compra</h4>
+          <p>Suscríbete y recibe antes que nadie las ofertas y colecciones nuevas de Formas Home.</p>
+          <input id="mail" type="email" placeholder="Tu correo electrónico" autocomplete="off">
+          <button class="btn" id="sub">Quiero mi regalo</button>
+          <p class="fine">En compras desde S/ 1,000. Puedes darte de baja cuando quieras.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1 · bienvenida -->
+    <section class="view" data-v="1"><div class="scroll">
+      <div class="mailbar"><div class="from"><span class="av"><img src="img/fh-favicon.png" alt=""></span><div><b>Formas Home</b><small>para <span class="who">ti</span></small></div></div>
+        <div class="subj">Bienvenido a Formas Home: aquí está tu regalo</div></div>
+      <div class="em">
+        <div class="em-head"><img src="img/fh-logo-negro.png" alt="Formas Home"></div>
+        <div class="em-hero"><img src="img/fh-slide-coleccion-delia.webp" alt=""></div>
+        <div class="em-body">
+          <div class="k">Bienvenido</div>
+          <h2>Tu casa, con muebles hechos para durar</h2>
+          <p>Gracias por sumarte. Como regalo de bienvenida tienes S/ 100 de descuento en tu primera compra desde S/ 1,000.</p>
+        </div>
+        <div class="coupon"><small>Tu regalo</small><strong>S/ 100</strong><code>BIENVENIDA</code></div>
+        <a class="em-cta">Usar mi regalo</a>
+        <div class="em-sec">Los más elegidos</div>
+        <div class="em-grid" id="gWelcome"></div>
+        <div class="bens">
+          <div><svg viewBox="0 0 24 24"><path d="M2 7h12v9H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Envío y armado gratis en Lima Metropolitana</div>
+          <div><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M3 10h18M7 15h4"/></svg>6 cuotas sin intereses desde S/ 1,000</div>
+          <div><svg viewBox="0 0 24 24"><path d="M4 20c1-4 4-6 8-6s7 2 8 6"/><circle cx="12" cy="8" r="4"/></svg>Te asesoramos por WhatsApp</div>
+        </div>
+        <div class="em-foot"><div class="soc"><span>Instagram</span><span>TikTok</span><span>WhatsApp</span></div>Formas Home · Lima, Perú<br>Recibes este correo porque te suscribiste en formashome.com · <u>Darme de baja</u></div>
+      </div>
+    </div></section>
+
+    <!-- 2 · newsletter -->
+    <section class="view" data-v="2"><div class="scroll">
+      <div class="mailbar"><div class="from"><span class="av"><img src="img/fh-favicon.png" alt=""></span><div><b>Formas Home</b><small>para <span class="who">ti</span></small></div></div>
+        <div class="subj">Seccional Hamil a S/ 4,000 y más ofertas de la quincena</div></div>
+      <div class="em">
+        <div class="em-head"><img src="img/fh-logo-negro.png" alt="Formas Home"></div>
+        <div class="em-hero"><img src="img/fh-slide-dormitorio-zola.webp" alt=""></div>
+        <div class="em-body">
+          <div class="k">Ofertas de la quincena</div>
+          <h2>Hasta 42 % menos en salas y seccionales</h2>
+          <p>Elegimos los modelos con mejor precio de estas semanas. Todos con envío y armado gratis en Lima Metropolitana.</p>
+        </div>
+        <div class="em-grid" id="gNews"></div>
+        <a class="em-cta">Ver todas las ofertas</a>
+        <div class="em-sec">Para inspirarte</div>
+        <div class="em-body" style="padding-top:0">
+          <p>Cómo elegir el sofá seccional: lado izquierdo o derecho, medidas y telas. Una guía corta del blog de Formas Home.</p>
+        </div>
+        <a class="em-cta" style="background:transparent;color:var(--ink);border:1px solid var(--ink)">Leer la guía</a>
+        <div class="em-foot"><div class="soc"><span>Instagram</span><span>TikTok</span><span>WhatsApp</span></div>Formas Home · Lima, Perú<br><u>Darme de baja</u></div>
+      </div>
+    </div></section>
+
+    <!-- 3 · carrito -->
+    <section class="view" data-v="3"><div class="scroll">
+      <div class="mailbar"><div class="from"><span class="av"><img src="img/fh-favicon.png" alt=""></span><div><b>Formas Home</b><small>para <span class="who">ti</span></small></div></div>
+        <div class="subj">Tu Sofá Delia te está esperando</div></div>
+      <div class="em">
+        <div class="em-head"><img src="img/fh-logo-negro.png" alt="Formas Home"></div>
+        <div class="em-body">
+          <div class="k">Lo dejaste en tu carrito</div>
+          <h2>Tu Sofá Delia te está esperando</h2>
+          <p>Lo guardamos para ti. Puedes terminar tu compra en un minuto y pagarlo en cuotas.</p>
+        </div>
+        <div class="cart">
+          <div class="im"><img src="img/sofa-delia-boucle-madera-tornillo.webp" alt=""></div>
+          <div><b>Sofá Delia 3 cuerpos</b><small>Tela bouclé · madera tornillo</small>
+            <div class="pr">S/ 2,500 <s>S/ 4,400</s></div><div class="cu">6 cuotas sin intereses de S/ 416.67</div></div>
+        </div>
+        <a class="em-cta">Terminar mi compra</a>
+        <p class="rev">Las reseñas de clientes salen aquí, tomadas de Judge.me<small>(se llenan solas cuando lleguen las primeras reseñas)</small></p>
+        <div class="bens">
+          <div><svg viewBox="0 0 24 24"><path d="M2 7h12v9H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Envío y armado gratis en Lima Metropolitana</div>
+          <div><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M3 10h18M7 15h4"/></svg>6 cuotas sin intereses desde S/ 1,000</div>
+          <div><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.2-4.6A8 8 0 1 1 21 12z"/></svg>¿Dudas? Escríbenos por WhatsApp</div>
+        </div>
+        <div class="em-foot">Formas Home · Lima, Perú<br><u>Darme de baja</u></div>
+      </div>
+    </div></section>
+
+    <!-- 4 · pantalla bloqueada -->
+    <section class="view" data-v="4">
+      <div class="lock">
+        <img src="img/fh-slide-dormitorio-zola.webp" alt="">
+        <div class="clock"><small>viernes, 14 de noviembre</small><b>19:30</b></div>
+        <div class="notifs">
+          <div class="n"><div class="ic"><img src="img/fh-favicon.png" alt=""></div><div><b>Formas Home <small>ahora</small></b><span>Bajó de precio: Seccional Hamil a S/ 4,000 (antes S/ 6,900). Pagas en 6 cuotas de S/ 666.67</span></div>
+            <div class="thumb"><img src="img/sofa-seccional-hamil-curvo-gris.webp" alt=""></div></div>
+          <div class="n"><div class="ic"><img src="img/fh-favicon.png" alt=""></div><div><b>Formas Home <small>hace 2 h</small></b><span>Tu Sofá Delia sigue en el carrito. Termina tu compra con envío y armado gratis en Lima.</span></div></div>
+        </div>
+        <div class="bar"></div>
+      </div>
+    </section>
+  </div></div></div>
+</main>
+
+<section class="band"><div class="sec">
+  <h2>Todo funciona solo, dentro de su Shopify</h2>
+  <p>Se arma una vez y después corre sin que nadie tenga que enviar nada. Los correos toman los productos, precios y fotos directo de la tienda, así que siempre están al día.</p>
+  <div class="flow">
+    <div><span class="t">Web</span><b>Ventana de suscripción</b><p>Aparece a los pocos segundos y una sola vez por persona. En celular y computadora.</p></div>
+    <div><span class="t">Al instante</span><b>Bienvenida con regalo</b><p>Cupón de un solo uso y los muebles más elegidos.</p></div>
+    <div><span class="t">Cada 15 días</span><b>Newsletter</b><p>Ofertas, colecciones nuevas y una idea del blog. Lo preparamos nosotros y ustedes lo aprueban.</p></div>
+    <div><span class="t">1 hora después</span><b>Carrito olvidado</b><p>Ya está activo en español desde el 11 de noviembre; le damos este diseño.</p><span class="ok">✓ Ya funciona</span></div>
+    <div><span class="t">En el celular</span><b>Avisos push</b><p>Bajadas de precio, carrito olvidado y novedades, aunque no abra su correo.</p></div>
+  </div>
+</div></section>
+
+<section class="sec">
+  <div class="two">
+    <div>
+      <h2>Con qué se empieza</h2>
+      <p style="margin-bottom:22px;color:var(--ink-2)">Su tienda ya tiene una base para arrancar y las herramientas no cuestan nada al inicio.</p>
+      <div class="facts">
+        <div><b>280</b><span>clientes ya registrados en su Shopify</span></div>
+        <div><b>10.000</b><span>correos al mes gratis con Shopify Messaging</span></div>
+        <div><b>500</b><span>avisos push al mes gratis (app PushOwl)</span></div>
+      </div>
+      <p class="note">Solo se escribe a quien aceptó recibir correos. Los avisos push funcionan en Android y computadora; en iPhone solo si la persona agregó la web a su pantalla de inicio.</p>
+    </div>
+    <div>
+      <h2>Lo que necesitamos de ustedes</h2>
+      <ol class="ask">
+        <li><b>El regalo de bienvenida.</b> En el simulador pusimos S/ 100 en compras desde S/ 1,000 como ejemplo. Puede ser otro monto o un porcentaje.</li>
+        <li><b>Cada cuánto enviar el newsletter.</b> Proponemos cada 15 días; puede ser semanal en temporadas como Navidad.</li>
+        <li><b>Su OK para los avisos al celular.</b> Instalamos la app gratis y la dejamos con los colores de Formas Home.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer><img src="img/fh-logo-negro.png" alt="Formas Home">Prototipo para revisión · no está publicado en la tienda</footer>
+
+<script>
+const P = {
+  hamil:{t:"Seccional Hamil",p:4000,c:6900,i:"sofa-seccional-hamil-curvo-gris"},
+  delia:{t:"Sofá Delia 3 cuerpos",p:2500,c:4400,i:"sofa-delia-boucle-madera-tornillo"},
+  oslo:{t:"Sofá Oslo 3 cuerpos",p:2500,c:3500,i:"sofa-oslo-3-cuerpos"},
+  capri:{t:"Sofá Capri 3 cuerpos",p:2300,c:3500,i:"sofa-capri-3-cuerpos"},
+  mirai:{t:"Sofá Mirai Habano",p:2300,c:3000,i:"sofa-de-3-mirai-habano"},
+  misti:{t:"Sofá Curvo Misti",p:3800,c:null,i:"sofa-curvo-misti"},
+  manila:{t:"Mesa Redonda Manila",p:2500,c:null,i:"mesa-redonda-manila"},
+  tleman:{t:"Sofá Tleman 3 cuerpos",p:3200,c:null,i:"sofa-tleman-3-cuerpos"}
+};
+const f = n => "S/ " + n.toLocaleString("en-US",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
+const card = k => { const x=P[k]; return `<div class="card"><div class="im"><img src="img/${x.i}.webp" alt="" loading="lazy"></div><b>${x.t}</b><div class="pr">${f(x.p)}${x.c?` <s>${f(x.c)}</s>`:""}</div>${x.p>=1000?`<div class="cu">6 cuotas de ${f(Math.round(x.p/6*100)/100)}</div>`:""}</div>`; };
+document.getElementById("gWelcome").innerHTML = ["delia","misti","oslo","manila"].map(card).join("");
+document.getElementById("gNews").innerHTML = ["hamil","delia","capri","mirai"].map(card).join("");
+
+const steps=[...document.querySelectorAll(".step")], views=[...document.querySelectorAll(".view")];
+const banner=document.getElementById("banner"), bannerTxt=document.getElementById("bannerTxt"), status=document.getElementById("status");
+let cur=0, timers=[];
+const later=(fn,ms)=>timers.push(setTimeout(fn,ms));
+const clear=()=>{timers.forEach(clearTimeout);timers=[];banner.classList.remove("in");};
+const msgs={1:"Bienvenido a Formas Home: aquí está tu regalo de S/ 100",2:"Seccional Hamil a S/ 4,000 y más ofertas de la quincena",3:"Tu Sofá Delia te está esperando"};
+
+function go(i, viaBanner){
+  clear(); cur=i;
+  steps.forEach((s,k)=>s.classList.toggle("on",k===i));
+  status.classList.toggle("light", i===4);
+  if(i>=1 && i<=3 && !viaBanner){
+    // la notificación cae primero sobre la pantalla anterior y luego se abre el correo
+    bannerTxt.textContent=msgs[i];
+    later(()=>banner.classList.add("in"),80);
+    later(()=>show(i),1500);
+    later(()=>banner.classList.remove("in"),1900);
+  } else show(i);
+  if(i===0){ views[0].classList.remove("pop"); later(()=>views[0].classList.add("pop"),1400); }
+  if(i===4){ const ns=[...document.querySelectorAll(".lock .n")]; ns.forEach(n=>n.classList.remove("in")); ns.forEach((n,k)=>later(()=>n.classList.add("in"),500+k*900)); }
+}
+function show(i){ views.forEach((v,k)=>{ v.classList.toggle("on",k===i); if(k===i){const s=v.querySelector(".scroll"); if(s) s.scrollTop=0;} }); }
+
+steps.forEach((s,k)=>s.addEventListener("click",()=>go(k)));
+document.getElementById("next").onclick=()=>go((cur+1)%5);
+document.getElementById("replay").onclick=()=>go(0);
+document.getElementById("closePop").onclick=()=>views[0].classList.remove("pop");
+document.getElementById("sub").onclick=()=>{
+  const v=document.getElementById("mail").value.trim();
+  document.querySelectorAll(".who").forEach(w=>w.textContent = v && v.includes("@") ? v : "ti");
+  views[0].classList.remove("pop"); later(()=>go(1),450);
+};
+go(0);
+</script>
+</body>
+</html>
