@@ -93,10 +93,11 @@ a{color:inherit}
 .popup .fine{font-size:10.5px;color:var(--soft);margin:10px 0 0}
 
 /* notificación entrante */
-.banner{position:absolute;top:54px;left:10px;right:10px;z-index:40;background:rgba(245,243,239,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:20px;padding:12px 14px;display:grid;grid-template-columns:38px 1fr;gap:10px;box-shadow:0 12px 30px -12px rgba(0,0,0,.35);transform:translateY(-160%);transition:transform .5s cubic-bezier(.2,.9,.2,1);cursor:pointer}
-.banner.in{transform:none}
+.banner{position:absolute;top:54px;left:10px;right:10px;z-index:40;background:rgba(245,243,239,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:20px;padding:12px 14px;display:grid;grid-template-columns:38px 1fr;gap:10px;box-shadow:0 12px 30px -12px rgba(0,0,0,.35);transform:translateY(-220%);visibility:hidden;transition:transform .5s cubic-bezier(.2,.9,.2,1),visibility .5s;cursor:pointer}
+.banner.in{transform:none;visibility:visible}
 .banner .ic{width:38px;height:38px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
-.banner .ic img{width:24px;filter:brightness(0) invert(1)}
+.banner .ic img{width:100%;height:100%;object-fit:cover}
+.banner .ic,.lock .n .ic,.mailbar .av{overflow:hidden}
 .banner .ic.mail{background:#2E7CF6}
 .banner .ic.mail svg{width:22px;stroke:#fff;fill:none;stroke-width:1.7}
 .banner b{font-size:13.5px;display:flex;justify-content:space-between}
@@ -107,7 +108,7 @@ a{color:inherit}
 .mailbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:52px 16px 10px;border-bottom:1px solid #eee}
 .mailbar .from{display:flex;gap:10px;align-items:center}
 .mailbar .av{width:34px;height:34px;border-radius:50%;background:var(--ink);display:grid;place-items:center;flex:none}
-.mailbar .av img{width:20px;filter:brightness(0) invert(1)}
+.mailbar .av img{width:100%;height:100%;object-fit:cover}
 .mailbar b{font-size:13.5px;display:block;line-height:1.2}
 .mailbar small{font-size:12px;color:#8a857c}
 .mailbar .subj{font-weight:600;font-size:15px;margin-top:8px;line-height:1.3}
@@ -159,12 +160,12 @@ a{color:inherit}
 .lock .n{background:rgba(245,243,239,.86);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;padding:12px 14px;display:grid;grid-template-columns:38px 1fr;gap:10px;opacity:0;transform:translateY(16px) scale(.98);transition:all .5s cubic-bezier(.2,.9,.2,1)}
 .lock .n.in{opacity:1;transform:none}
 .lock .n .ic{width:38px;height:38px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
-.lock .n .ic img{width:24px;filter:brightness(0) invert(1)}
+.lock .n .ic img{width:100%;height:100%;object-fit:cover}
 .lock .n b{font-size:13.5px;display:flex;justify-content:space-between}
 .lock .n b small{font-weight:400;color:#7d776e;font-size:12px}
 .lock .n span{font-size:13px;line-height:1.32;display:block;color:#24221f}
-.lock .n .thumb{grid-column:2;margin-top:8px;border-radius:10px;overflow:hidden;background:var(--cream-2);height:110px;display:grid;place-items:center}
-.lock .n .thumb img{max-height:100px}
+.lock .n .thumb{grid-column:1/-1;margin-top:10px;border-radius:12px;overflow:hidden;background:var(--cream-2);height:150px;display:grid;place-items:center;padding:8px 14px}
+.lock .n .thumb img{width:100%;height:100%;object-fit:contain}
 .lock .bar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#fff}
 
 /* ---------- debajo ---------- */
@@ -193,7 +194,8 @@ footer img{height:20px;width:auto;margin:0 auto 10px;opacity:.85}
 
 @media (max-width:980px){
   .hero{grid-template-columns:1fr;gap:16px;padding-top:40px}
-  .sim{grid-template-columns:1fr;gap:28px}
+  .sim{grid-template-columns:minmax(0,1fr);gap:28px}
+  .sim>div{min-width:0}
   .steps{position:static;flex-direction:row;overflow-x:auto;gap:8px;padding-bottom:6px;scrollbar-width:none}
   .steps::-webkit-scrollbar{display:none}
   .step{min-width:230px;grid-template-columns:36px 1fr;padding:14px}
@@ -241,7 +243,7 @@ footer img{height:20px;width:auto;margin:0 auto 10px;opacity:.85}
       <button class="step" data-s="2"><span class="dot"><svg viewBox="0 0 24 24"><path d="M4 19V9l8-5 8 5v10"/><path d="M9 19v-6h6v6"/></svg></span>
         <span><span class="when">Cada 15 días</span><h3>Newsletter de novedades</h3><p>Ofertas, colecciones nuevas e ideas para el hogar. Se arma con los productos de la tienda.</p></span></button>
       <button class="step" data-s="3"><span class="dot"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h11.2L21 8H6.2"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg></span>
-        <span><span class="when">1 hora después</span><h3>Carrito olvidado</h3><p>Si deja un mueble en el carrito sin pagar, le recordamos con su foto, precio y cuotas.</p></span></button>
+        <span><span class="when">Horas después</span><h3>Carrito olvidado</h3><p>Si deja un mueble en el carrito sin pagar, le recordamos con su foto, precio y cuotas.</p></span></button>
       <button class="step" data-s="4"><span class="dot"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg></span>
         <span><span class="when">En su celular</span><h3>Aviso en la pantalla</h3><p>Bajadas de precio y novedades llegan como notificación, aunque no abra su correo.</p></span></button>
     </div>
@@ -382,7 +384,7 @@ footer img{height:20px;width:auto;margin:0 auto 10px;opacity:.85}
     <div><span class="t">Web</span><b>Ventana de suscripción</b><p>Aparece a los pocos segundos y una sola vez por persona. En celular y computadora.</p></div>
     <div><span class="t">Al instante</span><b>Bienvenida con regalo</b><p>Cupón de un solo uso y los muebles más elegidos.</p></div>
     <div><span class="t">Cada 15 días</span><b>Newsletter</b><p>Ofertas, colecciones nuevas y una idea del blog. Lo preparamos nosotros y ustedes lo aprueban.</p></div>
-    <div><span class="t">1 hora después</span><b>Carrito olvidado</b><p>Ya está activo en español desde el 11 de noviembre; le damos este diseño.</p><span class="ok">✓ Ya funciona</span></div>
+    <div><span class="t">Horas después</span><b>Carrito olvidado</b><p>Ya está activo en español desde el 11 de noviembre; le damos este diseño.</p><span class="ok">✓ Ya funciona</span></div>
     <div><span class="t">En el celular</span><b>Avisos push</b><p>Bajadas de precio, carrito olvidado y novedades, aunque no abra su correo.</p></div>
   </div>
 </div></section>
@@ -439,6 +441,7 @@ function go(i, viaBanner){
   clear(); cur=i;
   steps.forEach((s,k)=>s.classList.toggle("on",k===i));
   status.classList.toggle("light", i===4);
+  document.getElementById("hora").style.visibility = i===4 ? "hidden" : "visible";
   if(i>=1 && i<=3 && !viaBanner){
     // la notificación cae primero sobre la pantalla anterior y luego se abre el correo
     bannerTxt.textContent=msgs[i];
